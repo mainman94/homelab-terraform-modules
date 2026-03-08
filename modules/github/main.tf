@@ -20,6 +20,14 @@ resource "github_repository" "this" {
   archived             = var.archived
   archive_on_destroy   = var.archive_on_destroy
   vulnerability_alerts = var.vulnerability_alerts
+
+  lifecycle {
+    ignore_changes = [
+      archive_on_destroy,
+      has_downloads,
+      ignore_vulnerability_alerts_during_read,
+    ]
+  }
 }
 
 resource "github_branch_default" "this" {
