@@ -24,7 +24,6 @@ resource "github_repository" "this" {
   lifecycle {
     ignore_changes = [
       archive_on_destroy,
-      has_downloads,
       ignore_vulnerability_alerts_during_read,
     ]
   }
