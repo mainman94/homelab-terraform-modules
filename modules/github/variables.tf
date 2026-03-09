@@ -126,3 +126,77 @@ variable "default_branch" {
   default     = null
   nullable    = true
 }
+
+variable "rulesets" {
+  description = "Repository rulesets keyed by a stable Terraform identifier. Currently only branch rulesets are supported by this module wrapper."
+  type = map(object({
+    name             = string
+    target           = optional(string, "branch")
+    enforcement      = optional(string, "active")
+    ref_name_include = optional(set(string), ["~DEFAULT_BRANCH"])
+    ref_name_exclude = optional(set(string), [])
+    bypass_actors = optional(list(object({
+      actor_id    = optional(number)
+      actor_type  = string
+      bypass_mode = optional(string, "always")
+    })), [])
+    rules = object({
+      creation                = optional(bool)
+      update                  = optional(bool)
+      deletion                = optional(bool)
+      non_fast_forward        = optional(bool)
+      required_linear_history = optional(bool)
+      required_signatures     = optional(bool)
+      pull_request = optional(object({
+        allowed_merge_methods             = optional(set(string), ["merge", "squash", "rebase"])
+        dismiss_stale_reviews_on_push     = optional(bool, false)
+        require_code_owner_review         = optional(bool, false)
+        require_last_push_approval        = optional(bool, false)
+        required_approving_review_count   = optional(number, 0)
+        required_review_thread_resolution = optional(bool, false)
+      }))
+      required_status_checks = optional(object({
+        strict_required_status_checks_policy = optional(bool, false)
+        do_not_enforce_on_create             = optional(bool, false)
+        required_checks = set(object({
+          context        = string
+          integration_id = optional(number)
+        }))
+      }))
+    })
+  }))
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for ruleset in values(var.rulesets) : contains(["branch"], ruleset.target)
+    ])
+    error_message = "rulesets currently support only the branch target in this module wrapper."
+  }
+
+  validation {
+    condition = alltrue([
+      for ruleset in values(var.rulesets) : contains(["active", "disabled", "evaluate"], ruleset.enforcement)
+    ])
+    error_message = "ruleset enforcement must be one of: active, disabled, evaluate."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for ruleset in values(var.rulesets) : ruleset.rules.pull_request == null ? [true] : [
+        ruleset.rules.pull_request.required_approving_review_count >= 0 &&
+        ruleset.rules.pull_request.required_approving_review_count <= 6
+      ]
+    ]))
+    error_message = "ruleset pull request approval count must be between 0 and 6."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for ruleset in values(var.rulesets) : ruleset.rules.pull_request == null ? [true] : [
+        length(setsubtract(ruleset.rules.pull_request.allowed_merge_methods, toset(["merge", "squash", "rebase"]))) == 0
+      ]
+    ]))
+    error_message = "ruleset allowed_merge_methods may only contain merge, squash, or rebase."
+  }
+}

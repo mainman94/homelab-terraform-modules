@@ -1,11 +1,12 @@
 # GitHub Terraform Module
 
-Terraform module for managing a GitHub repository and, optionally, its default branch.
+Terraform module for managing a GitHub repository, its default branch, and optional repository rulesets.
 
 ## Features
 
 - Manages a `github_repository`
 - Optionally manages the repository default branch with `github_branch_default`
+- Optionally manages `github_repository_ruleset` resources for branch governance
 - Exposes repository identifiers and URLs as outputs
 
 ## Requirements
@@ -43,6 +44,22 @@ module "repository" {
   has_wiki       = false
   allow_forking  = true
   default_branch = "main"
+
+  rulesets = {
+    default_branch = {
+      name = "default-branch-protection"
+      rules = {
+        deletion                = true
+        non_fast_forward        = true
+        required_linear_history = true
+        pull_request = {
+          dismiss_stale_reviews_on_push    = true
+          required_approving_review_count  = 1
+          required_review_thread_resolution = true
+        }
+      }
+    }
+  }
 }
 ```
 
@@ -52,7 +69,7 @@ After wiring the module in a root stack, import the existing repository into sta
 
 ```bash
 terraform import module.homelab_repository.github_repository.this homelab
-terraform import module.homelab_repository.github_branch_default.this[0] homelab:main
+terraform import 'module.homelab_repository.github_branch_default.this[0]' homelab
 ```
 
 The repository import uses the repository name within the configured owner.
@@ -80,6 +97,7 @@ The repository import uses the repository name within the configured owner.
 | `archive_on_destroy`     | `bool`        | `true`      | Archive instead of deleting on destroy.                    |
 | `vulnerability_alerts`   | `bool`        | `null`      | Whether vulnerability alerts are enabled.                  |
 | `default_branch`         | `string`      | `null`      | Default branch to manage.                                  |
+| `rulesets`               | `map(object(...))` | `{}`    | Branch rulesets keyed by a stable Terraform identifier.    |
 
 ## Outputs
 
