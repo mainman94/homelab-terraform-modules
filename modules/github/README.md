@@ -76,28 +76,28 @@ The repository import uses the repository name within the configured owner.
 
 ## Inputs
 
-| Name                     | Type          | Default     | Description                                                |
-| ------------------------ | ------------- | ----------- | ---------------------------------------------------------- |
-| `name`                   | `string`      | n/a         | Repository name.                                           |
-| `description`            | `string`      | `null`      | Repository description.                                    |
-| `homepage_url`           | `string`      | `null`      | Repository homepage URL.                                   |
-| `visibility`             | `string`      | `"private"` | Repository visibility.                                     |
-| `topics`                 | `set(string)` | `[]`        | Repository topics.                                         |
-| `has_issues`             | `bool`        | `true`      | Whether issues are enabled.                                |
-| `has_projects`           | `bool`        | `false`     | Whether projects are enabled.                              |
-| `has_wiki`               | `bool`        | `false`     | Whether the wiki is enabled.                               |
-| `allow_merge_commit`     | `bool`        | `null`      | Whether merge commits are allowed.                         |
-| `allow_squash_merge`     | `bool`        | `null`      | Whether squash merges are allowed.                         |
-| `allow_rebase_merge`     | `bool`        | `null`      | Whether rebase merges are allowed.                         |
-| `allow_auto_merge`       | `bool`        | `null`      | Whether auto-merge is allowed.                             |
-| `delete_branch_on_merge` | `bool`        | `null`      | Whether merged branches are deleted automatically.         |
-| `allow_update_branch`    | `bool`        | `null`      | Whether pull requests can be updated with the base branch. |
-| `allow_forking`          | `bool`        | `null`      | Whether the repository can be forked.                      |
-| `archived`               | `bool`        | `false`     | Whether the repository is archived.                        |
-| `archive_on_destroy`     | `bool`        | `true`      | Archive instead of deleting on destroy.                    |
-| `vulnerability_alerts`   | `bool`        | `null`      | Whether vulnerability alerts are enabled.                  |
-| `default_branch`         | `string`      | `null`      | Default branch to manage.                                  |
-| `rulesets`               | `map(object(...))` | `{}`    | Branch rulesets keyed by a stable Terraform identifier.    |
+| Name                     | Type               | Default     | Description                                                |
+| ------------------------ | ------------------ | ----------- | ---------------------------------------------------------- |
+| `name`                   | `string`           | n/a         | Repository name.                                           |
+| `description`            | `string`           | `null`      | Repository description.                                    |
+| `homepage_url`           | `string`           | `null`      | Repository homepage URL.                                   |
+| `visibility`             | `string`           | `"private"` | Repository visibility.                                     |
+| `topics`                 | `set(string)`      | `[]`        | Repository topics.                                         |
+| `has_issues`             | `bool`             | `true`      | Whether issues are enabled.                                |
+| `has_projects`           | `bool`             | `false`     | Whether projects are enabled.                              |
+| `has_wiki`               | `bool`             | `false`     | Whether the wiki is enabled.                               |
+| `allow_merge_commit`     | `bool`             | `null`      | Whether merge commits are allowed.                         |
+| `allow_squash_merge`     | `bool`             | `null`      | Whether squash merges are allowed.                         |
+| `allow_rebase_merge`     | `bool`             | `null`      | Whether rebase merges are allowed.                         |
+| `allow_auto_merge`       | `bool`             | `null`      | Whether auto-merge is allowed.                             |
+| `delete_branch_on_merge` | `bool`             | `null`      | Whether merged branches are deleted automatically.         |
+| `allow_update_branch`    | `bool`             | `null`      | Whether pull requests can be updated with the base branch. |
+| `allow_forking`          | `bool`             | `null`      | Whether the repository can be forked.                      |
+| `archived`               | `bool`             | `false`     | Whether the repository is archived.                        |
+| `archive_on_destroy`     | `bool`             | `true`      | Archive instead of deleting on destroy.                    |
+| `vulnerability_alerts`   | `bool`             | `null`      | Whether vulnerability alerts are enabled.                  |
+| `default_branch`         | `string`           | `null`      | Default branch to manage.                                  |
+| `rulesets`               | `map(object(...))` | `{}`        | Branch rulesets keyed by a stable Terraform identifier.    |
 
 ## Outputs
 
