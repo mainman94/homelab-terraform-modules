@@ -63,7 +63,18 @@ module "backblaze_bucket" {
 
 ## Outputs
 
-This module currently does not define Terraform outputs.
+| Name          | Description                    |
+| ------------- | ------------------------------ |
+| `bucket_id`   | Backblaze B2 bucket ID.        |
+| `bucket_name` | Backblaze B2 bucket name.      |
+
+## State migration
+
+If you are upgrading an existing state that tracked the bucket under the old resource address, run:
+
+```bash
+terraform state mv 'module.<name>.b2_bucket.homelab_backup_bucket' 'module.<name>.b2_bucket.this'
+```
 
 ## Example
 

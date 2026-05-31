@@ -1,4 +1,4 @@
-resource "b2_bucket" "homelab_backup_bucket" {
+resource "b2_bucket" "this" {
 
   bucket_name = var.bucket_name
   bucket_type = var.bucket_type

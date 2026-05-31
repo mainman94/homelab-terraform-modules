@@ -24,6 +24,28 @@ resource "cloudflare_dns_record" "a_records" {
   }
 }
 
+resource "cloudflare_dns_record" "a_records_by_ip" {
+  for_each = var.a_records_by_ip
+
+  zone_id = var.zone_id
+  name    = each.key
+  content = each.value
+  type    = "A"
+  ttl     = 1
+  proxied = var.a_records_by_ip_proxied
+}
+
+resource "cloudflare_dns_record" "cname_records" {
+  for_each = var.cname_records
+
+  zone_id = var.zone_id
+  name    = each.key
+  content = each.value
+  type    = "CNAME"
+  ttl     = 1
+  proxied = var.cname_records_proxied
+}
+
 resource "cloudflare_dns_record" "cname_tunnel_records" {
   for_each = var.cname_tunnel_records
 

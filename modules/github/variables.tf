@@ -199,4 +199,16 @@ variable "rulesets" {
     ]))
     error_message = "ruleset allowed_merge_methods may only contain merge, squash, or rebase."
   }
+
+  validation {
+    condition = alltrue(flatten([
+      for ruleset in values(var.rulesets) : [
+        for actor in ruleset.bypass_actors : contains(
+          ["RepositoryRole", "Team", "Integration", "OrganizationAdmin"],
+          actor.actor_type
+        )
+      ]
+    ]))
+    error_message = "bypass_actors actor_type must be one of: RepositoryRole, Team, Integration, OrganizationAdmin."
+  }
 }

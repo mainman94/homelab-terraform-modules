@@ -22,3 +22,8 @@ output "repository_default_branch" {
   description = "Managed default branch name, or null when not configured."
   value       = try(github_branch_default.this[0].branch, null)
 }
+
+output "ruleset_ids" {
+  description = "Map of ruleset Terraform keys to GitHub ruleset node IDs."
+  value       = { for k, r in github_repository_ruleset.this : k => r.node_id }
+}

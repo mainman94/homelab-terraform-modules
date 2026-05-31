@@ -108,3 +108,4 @@ The repository import uses the repository name within the configured owner.
 | `repository_full_name`      | GitHub repository full name.                                |
 | `repository_html_url`       | GitHub repository HTML URL.                                 |
 | `repository_default_branch` | Managed default branch name, or `null` when not configured. |
+| `ruleset_ids`               | Map of ruleset Terraform keys to GitHub ruleset node IDs.   |

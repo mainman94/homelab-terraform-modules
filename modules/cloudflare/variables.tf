@@ -27,6 +27,18 @@ variable "a_records_proxied" {
   default     = true
 }
 
+variable "a_records_by_ip" {
+  description = "Map of A record name to IPv4 address. Use when different records need different IPs."
+  type        = map(string)
+  default     = {}
+}
+
+variable "a_records_by_ip_proxied" {
+  description = "Whether a_records_by_ip records should be proxied by Cloudflare."
+  type        = bool
+  default     = true
+}
+
 variable "tunnel_id" {
   description = "Cloudflare Tunnel ID used to build tunnel CNAME targets. Required when cname_tunnel_records is not empty."
   type        = string
@@ -46,6 +58,18 @@ variable "cname_tunnel_records_proxied" {
   default     = true
 }
 
+variable "cname_records" {
+  description = "Map of CNAME record name to target hostname. Use for arbitrary CNAMEs not backed by a Cloudflare Tunnel."
+  type        = map(string)
+  default     = {}
+}
+
+variable "cname_records_proxied" {
+  description = "Whether cname_records should be proxied by Cloudflare."
+  type        = bool
+  default     = false
+}
+
 variable "create_spf_record" {
   description = "Whether to create an SPF TXT record."
   type        = bool
@@ -60,9 +84,9 @@ variable "spf_record_name" {
 }
 
 variable "spf_record_value" {
-  description = "TXT content for the SPF record, including any required quoting."
+  description = "TXT content for the SPF record. Do not include surrounding quotes; the provider handles quoting."
   type        = string
-  default     = "\"v=spf1 include:_spf.mx.cloudflare.net ~all\""
+  default     = "v=spf1 include:_spf.mx.cloudflare.net ~all"
 }
 
 variable "dkim_record_name" {
@@ -70,6 +94,11 @@ variable "dkim_record_name" {
   type        = string
   default     = null
   nullable    = true
+
+  validation {
+    condition     = (var.dkim_record_name == null) == (var.dkim_public_key == null)
+    error_message = "dkim_record_name and dkim_public_key must both be set or both be null."
+  }
 }
 
 variable "dkim_public_key" {
@@ -89,4 +118,9 @@ variable "email_routing_rules" {
     priority     = optional(number, 0)
   }))
   default = []
+
+  validation {
+    condition     = length(var.email_routing_rules) == length(distinct([for r in var.email_routing_rules : r.name]))
+    error_message = "email_routing_rules names must be unique."
+  }
 }

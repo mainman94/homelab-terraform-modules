@@ -30,6 +30,17 @@ variable "default_server_side_encryption" {
     algorithm = "AES256"
     mode      = "SSE-B2"
   }
+  nullable = true
+
+  validation {
+    condition     = var.default_server_side_encryption == null || contains(["AES256"], var.default_server_side_encryption.algorithm)
+    error_message = "default_server_side_encryption.algorithm must be AES256."
+  }
+
+  validation {
+    condition     = var.default_server_side_encryption == null || contains(["SSE-B2", "SSE-C"], var.default_server_side_encryption.mode)
+    error_message = "default_server_side_encryption.mode must be SSE-B2 or SSE-C."
+  }
 }
 
 variable "lifecycle_rules" {

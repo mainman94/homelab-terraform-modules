@@ -5,6 +5,20 @@ output "a_record_ids" {
   }
 }
 
+output "a_records_by_ip_ids" {
+  description = "Map of per-IP A record names to Cloudflare record IDs."
+  value = {
+    for name, record in cloudflare_dns_record.a_records_by_ip : name => record.id
+  }
+}
+
+output "cname_record_ids" {
+  description = "Map of arbitrary CNAME record names to Cloudflare record IDs."
+  value = {
+    for name, record in cloudflare_dns_record.cname_records : name => record.id
+  }
+}
+
 output "cname_tunnel_record_ids" {
   description = "Map of tunnel CNAME record names to Cloudflare record IDs."
   value = {
