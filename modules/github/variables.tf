@@ -134,6 +134,13 @@ variable "secret_scanning_push_protection" {
   nullable    = true
 }
 
+variable "dependabot_security_updates" {
+  description = "Whether Dependabot security updates are enabled. Null leaves the repository's current setting untouched."
+  type        = bool
+  default     = null
+  nullable    = true
+}
+
 variable "default_branch" {
   description = "Default branch to enforce for the repository. Set to null to skip managing it."
   type        = string

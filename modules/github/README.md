@@ -98,6 +98,7 @@ The repository import uses the repository name within the configured owner.
 | `vulnerability_alerts`   | `bool`             | `null`      | Whether vulnerability alerts are enabled.                  |
 | `secret_scanning`        | `bool`             | `null`      | Whether secret scanning is enabled.                        |
 | `secret_scanning_push_protection` | `bool`    | `null`      | Whether secret scanning push protection is enabled.        |
+| `dependabot_security_updates` | `bool`   | `null`      | Whether Dependabot security updates are enabled.           |
 | `default_branch`         | `string`           | `null`      | Default branch to manage.                                  |
 | `rulesets`               | `map(object(...))` | `{}`        | Branch rulesets keyed by a stable Terraform identifier.    |
 

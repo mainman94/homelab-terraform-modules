@@ -48,6 +48,13 @@ resource "github_repository" "this" {
   }
 }
 
+resource "github_repository_dependabot_security_updates" "this" {
+  count = var.dependabot_security_updates == null ? 0 : 1
+
+  repository = github_repository.this.name
+  enabled    = var.dependabot_security_updates
+}
+
 resource "github_branch_default" "this" {
   count = var.default_branch == null ? 0 : 1
 
