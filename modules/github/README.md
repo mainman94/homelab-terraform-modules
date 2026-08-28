@@ -96,6 +96,8 @@ The repository import uses the repository name within the configured owner.
 | `archived`               | `bool`             | `false`     | Whether the repository is archived.                        |
 | `archive_on_destroy`     | `bool`             | `true`      | Archive instead of deleting on destroy.                    |
 | `vulnerability_alerts`   | `bool`             | `null`      | Whether vulnerability alerts are enabled.                  |
+| `secret_scanning`        | `bool`             | `null`      | Whether secret scanning is enabled.                        |
+| `secret_scanning_push_protection` | `bool`    | `null`      | Whether secret scanning push protection is enabled.        |
 | `default_branch`         | `string`           | `null`      | Default branch to manage.                                  |
 | `rulesets`               | `map(object(...))` | `{}`        | Branch rulesets keyed by a stable Terraform identifier.    |
 

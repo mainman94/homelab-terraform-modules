@@ -21,6 +21,26 @@ resource "github_repository" "this" {
   archive_on_destroy   = var.archive_on_destroy
   vulnerability_alerts = var.vulnerability_alerts
 
+  dynamic "security_and_analysis" {
+    for_each = var.secret_scanning == null && var.secret_scanning_push_protection == null ? [] : [1]
+
+    content {
+      dynamic "secret_scanning" {
+        for_each = var.secret_scanning == null ? [] : [1]
+        content {
+          status = var.secret_scanning ? "enabled" : "disabled"
+        }
+      }
+
+      dynamic "secret_scanning_push_protection" {
+        for_each = var.secret_scanning_push_protection == null ? [] : [1]
+        content {
+          status = var.secret_scanning_push_protection ? "enabled" : "disabled"
+        }
+      }
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       archive_on_destroy,

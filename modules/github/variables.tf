@@ -120,6 +120,20 @@ variable "vulnerability_alerts" {
   nullable    = true
 }
 
+variable "secret_scanning" {
+  description = "Whether secret scanning is enabled. Null leaves the repository's current setting untouched. Not available on private repositories without GitHub Advanced Security."
+  type        = bool
+  default     = null
+  nullable    = true
+}
+
+variable "secret_scanning_push_protection" {
+  description = "Whether secret scanning push protection is enabled. Null leaves the repository's current setting untouched."
+  type        = bool
+  default     = null
+  nullable    = true
+}
+
 variable "default_branch" {
   description = "Default branch to enforce for the repository. Set to null to skip managing it."
   type        = string
