@@ -1,0 +1,57 @@
+# Local checks for the shared Terraform modules.
+#
+# These modules are consumed by the homelab repo, so a breaking change here
+# lands in a real plan somewhere else. Anything that needs `terraform init`
+# — validate, tofu test, provider-aware tflint rules — pulls providers over
+# the network and is therefore too slow for a commit hook; it lives in the
+# Makefile (`make validate`, `make test`) and in CI instead.
+#
+# Install once:  make hooks
+# Run manually:  make lint
+minimum_pre_commit_version: "3.5.0"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: check-added-large-files
+        args: [--maxkb=512]
+      - id: check-json
+        # devcontainer.json is JSONC by spec — the format allows the
+        # comments explaining each feature, which a strict JSON parser
+        # will not accept.
+        exclude: ^\.devcontainer/
+      - id: check-yaml
+      - id: detect-private-key
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.109.1
+    hooks:
+      - id: terraform_fmt
+
+      # Keeps the inputs/outputs reference in each module README in step with
+      # variables.tf and outputs.tf. Only the block between the TF_DOCS
+      # markers is generated; the prose above it is hand-written.
+      - id: terraform_docs
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=false
+
+      # Core ruleset only (see .tflint.hcl) — the provider plugins would need
+      # a network fetch on every run.
+      - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
