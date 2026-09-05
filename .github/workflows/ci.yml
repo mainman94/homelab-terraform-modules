@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # terraform_fmt, terraform_docs and terraform_tflint all shell out to
+      # binaries the hooks do not install themselves.
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.10.6"
+
+      - uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: v0.64.0
+
+      # terraform-docs has no setup action that puts the binary on PATH,
+      # which is what the terraform_docs hook needs.
+      - name: Install terraform-docs
+        env:
+          TERRAFORM_DOCS_VERSION: v0.20.0
+        run: |
+          curl -sSL "https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz" \
+            | sudo tar xz -C /usr/local/bin terraform-docs
+          sudo chmod +x /usr/local/bin/terraform-docs
+
+      # A README whose generated block is stale fails here: the hook rewrites
+      # it and pre-commit reports the file as modified.
+      - name: Run every hook
+        uses: pre-commit/action@v3.0.1
+        env:
+          # pre-commit-terraform prefers `terraform`; only tofu is installed.
+          PCT_TFPATH: tofu
+
+  test:
+    name: tftest (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [backblaze, cloudflare, github]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.10.6"
+
+      # The suites use mock_provider, so no credentials are needed — but the
+      # providers still have to be downloaded before `tofu test` can plan.
+      - name: Validate and test
+        working-directory: modules/${{ matrix.module }}
+        run: |
+          tofu init -backend=false -input=false
+          tofu validate
+          tofu test
+
+  scan:
+    name: trivy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Scan module config
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: modules
+          format: sarif
+          output: trivy.sarif
+          # Advisory: findings land in the Security tab rather than blocking
+          # a PR on a rule nobody has triaged yet.
+          exit-code: "0"
+
+      - uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy.sarif
