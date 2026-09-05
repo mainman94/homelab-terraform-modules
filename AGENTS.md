@@ -27,7 +27,7 @@ Modules: `cloudflare`, `github`, `backblaze`.
 | `make validate`           | `terraform validate` each module                      |
 | `make docs`               | Regenerate the terraform-docs block in each README    |
 | `make fmt`                | Rewrite to canonical format                           |
-| `make security`           | trivy misconfiguration scan                           |
+| `make scan`               | trivy misconfiguration scan (advisory, like CI)       |
 | `make lint-deep`          | tflint with provider rulesets (fetches plugins)       |
 
 `make` uses `tofu` when OpenTofu is installed and `terraform` otherwise;
@@ -44,6 +44,18 @@ Anything needing `terraform init` — `validate`, `tofu test`, provider-aware
 tflint rules — pulls providers over the network on every run, which is too
 slow for a commit hook. Those live in `make validate`, `make test` and
 `make lint-deep`, and are what `make check` runs before a PR.
+
+`.github/workflows/ci.yml` runs all three on every PR, so the checks no
+longer depend on whoever remembered to install the hook:
+
+- **pre-commit**, with tofu, tflint and terraform-docs installed so every
+  hook really runs. A README whose generated block is stale fails here — the
+  hook rewrites it and pre-commit reports the file as modified.
+- **tftest**, one matrix leg per module. The suites use `mock_provider`, so
+  no credentials — but providers still download before `tofu test` can plan.
+- **trivy** config scan, uploading SARIF to the Security tab. Advisory: it
+  does not block a PR on a rule nobody has triaged. `make scan-strict` is the
+  gating version.
 
 ## Conventions
 

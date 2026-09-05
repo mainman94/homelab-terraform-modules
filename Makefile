@@ -68,10 +68,18 @@ lint-deep: ## tflint including provider rulesets (fetches plugins)
 		tflint --chdir=modules/$$m --config="$(CURDIR)/.tflint.hcl"; \
 	done
 
-.PHONY: security
-security: ## Scan the modules for misconfigurations
+.PHONY: scan
+scan: ## Scan the modules for misconfigurations (advisory, like CI)
+	@command -v trivy >/dev/null || { echo "trivy not on PATH — see .devcontainer" >&2; exit 1; }
+	trivy config modules/
+
+.PHONY: scan-strict
+scan-strict: ## Same scan, but fail on any finding
 	@command -v trivy >/dev/null || { echo "trivy not on PATH — see .devcontainer" >&2; exit 1; }
 	trivy config --exit-code 1 modules/
+
+.PHONY: security
+security: scan ## Alias for scan
 
 .PHONY: check
 check: lint validate test ## Everything a PR needs to pass
