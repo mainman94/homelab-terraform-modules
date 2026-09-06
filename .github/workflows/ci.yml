@@ -56,6 +56,27 @@ jobs:
           tofu validate
           tofu test
 
+  versions:
+    name: version bump
+    # Only on pull requests: it compares against the base branch, and a push
+    # to main has already been through this gate.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # The comparison needs the base branch's history, not just this commit.
+          fetch-depth: 0
+          persist-credentials: false
+
+      # A module whose Terraform changed must carry a new VERSION, because
+      # consumers pin by tag: a change that ships without a bump is a change
+      # nobody can consume, sitting on main looking released.
+      - name: A changed module must bump its VERSION
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: scripts/check-version-bumped.sh "origin/$BASE_REF"
+
   scan:
     name: trivy
     runs-on: ubuntu-latest

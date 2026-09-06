@@ -67,6 +67,19 @@ repos:
     rev: v1.9.0
     hooks:
       - id: zizmor
+        # Ignores (with reasons) live in .github/zizmor.yml.
+        args: [--no-progress, --config, .github/zizmor.yml]
+
+  - repo: local
+    hooks:
+      # A VERSION file is what the release workflow turns into a tag that
+      # consumers pin to, so its format is checked before it can be pushed.
+      - id: module-versions
+        name: module VERSION files are well formed
+        entry: scripts/check-versions.sh
+        language: script
+        files: ^modules/.*/VERSION$
+        pass_filenames: false
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0

@@ -1,0 +1,43 @@
+name: Release
+
+# A push to main that changes a module's VERSION is the release trigger — the
+# same shape as docker-strapi's release-versions/. Nothing is tagged by hand:
+# the token here can push tags, and a human's cannot always.
+#
+# scripts/release.sh is idempotent, so a push touching one module's VERSION
+# leaves the others alone, and a re-run does nothing.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "modules/*/VERSION"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: tag and release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create tags and GitHub releases
+    steps:
+      # zizmor: ignore[artipacked]
+      # The credential has to stay in the checkout's git config: this job
+      # pushes the tags. fetch-depth 0 so `git rev-parse refs/tags/...` can
+      # see whether a version is already released.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Identify the tagger
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: scripts/release.sh
