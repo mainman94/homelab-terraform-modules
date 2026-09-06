@@ -78,6 +78,22 @@ lint-deep: ## tflint including provider rulesets (fetches plugins)
 		tflint --chdir=modules/$$m --config="$(CURDIR)/.tflint.hcl"; \
 	done
 
+.PHONY: versions
+versions: ## Show the version each module will release as
+	@for m in $(MODULES); do printf '%-12s %s\n' "$$m" "$$(cat modules/$$m/VERSION 2>/dev/null || echo '(none)')"; done
+
+.PHONY: release-check
+release-check: ## Check every VERSION is well formed, and which are unreleased
+	scripts/check-versions.sh
+	@for m in $(MODULES); do \
+		v=$$(tr -d '[:space:]' < modules/$$m/VERSION); \
+		if git rev-parse -q --verify "refs/tags/$$m-$$v" >/dev/null; then \
+			printf '%-12s %-8s released\n' "$$m" "$$v"; \
+		else \
+			printf '%-12s %-8s NOT yet tagged — merging it releases it\n' "$$m" "$$v"; \
+		fi; \
+	done
+
 .PHONY: scan
 scan: ## Scan the modules for misconfigurations (advisory, like CI)
 	@command -v trivy >/dev/null || { echo "trivy not on PATH — run make tools" >&2; exit 1; }

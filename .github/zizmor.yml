@@ -1,0 +1,10 @@
+# zizmor configuration. Rule-level ignores live here rather than as inline
+# comments so the reason is written down once, next to the rule.
+
+rules:
+  artipacked:
+    ignore:
+      # release.yml pushes the tags it creates, so the credential has to stay
+      # in the checkout's git config. Nothing else in the job touches the
+      # working tree.
+      - release.yml
