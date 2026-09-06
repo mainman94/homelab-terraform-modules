@@ -1,27 +1,31 @@
 #!/usr/bin/env bash
-# Provision the dev container. trivy has no devcontainer feature, so it is
-# installed from Aqua's apt repository at whatever version is current.
+# Provision the dev container. Everything the repo needs is pinned in
+# mise.toml — tofu, tflint, terraform-docs, trivy, actionlint, python and
+# pre-commit — so this script only has to install mise and let it do the
+# rest. CI installs from the same file.
 set -euo pipefail
 
-echo "==> installing pre-commit"
-pipx install pre-commit 2>/dev/null || pip install --user --break-system-packages pre-commit
+echo "==> installing mise"
+curl -fsSL https://mise.run | sh
 export PATH="$HOME/.local/bin:$PATH"
 
-echo "==> installing trivy"
-sudo apt-get update -qq
-sudo apt-get install -y -qq wget gnupg
-wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key \
-  | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
-echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" \
-  | sudo tee /etc/apt/sources.list.d/trivy.list >/dev/null
-sudo apt-get update -qq
-sudo apt-get install -y -qq trivy
+# Activate for interactive shells so the pinned binaries are on PATH.
+for shell in bash zsh; do
+  rc="$HOME/.${shell}rc"
+  [ -f "$rc" ] || continue
+  grep -q "mise activate" "$rc" || echo "eval \"\$(mise activate $shell)\"" >> "$rc"
+done
+
+echo "==> installing the pinned toolchain"
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+mise trust
+mise install
 
 echo "==> installing the git hook"
-pre-commit install
+mise exec -- pre-commit install
 
 echo "==> warming hook environments"
-pre-commit install-hooks
+mise exec -- pre-commit install-hooks
 
 cat <<'MSG'
 
@@ -31,5 +35,6 @@ homelab-terraform-modules dev container ready.
   make check               hooks + validate + tftest across every module
   make test MODULE=github  one module's tftest suite
 
+Tool versions come from mise.toml — the same file CI installs from.
 The tftest suites use mock providers, so they need no real credentials.
 MSG

@@ -35,4 +35,11 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-.claude
+# Agent configuration is shared (same rule as multi-k8s-infra and
+# docker-stack): the hooks, skills and reviewer agent are checked in,
+# anything else under .claude/ is local scratch.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/skills/
+!.claude/agents/
