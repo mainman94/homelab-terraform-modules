@@ -83,7 +83,7 @@ longer depend on whoever remembered to install the hook:
 ## Releases
 
 Consumers pin by tag — `homelab/terraform/*/main.tf` carries
-`?ref=github-0.1.8` and friends — so a change that reaches `main` without a
+`?ref=github-0.1.9` and friends — so a change that reaches `main` without a
 new tag is a change nobody can consume. It sits there looking released while
 every tag points at an older commit. That has already happened once.
 
@@ -114,6 +114,26 @@ Two checks keep it honest:
 To release: bump the file in the same pull request as the change, and say in
 the commit message what moved. `make release-check` shows which versions are
 already tagged.
+
+## Agent tooling
+
+`.claude/` is checked in, so every agent working here starts from the same
+setup:
+
+- **`agents/module-reviewer.md`** — reviews a diff for breaking changes to
+  consumers, missing validation or tests, and convention drift. Nothing here
+  plans against a real account, so a consumer's plan is where a mistake
+  surfaces; ask for this review before pushing a variable change.
+- **`skills/new-module/SKILL.md`** — scaffolds a module with the full shape
+  (`examples/basic/`, README, `tests/`, `VERSION`), which is easy to
+  half-finish by hand.
+- **`hooks/guard-secrets.sh`** (PreToolUse) blocks a write that would put a
+  credential in the repo; **`hooks/format-terraform.sh`** (PostToolUse) runs
+  `terraform fmt` on what was just written, so `fmt -check` does not fail on
+  whitespace.
+
+The hooks fire automatically from `settings.json`; the agent and skill are
+invoked deliberately.
 
 ## Conventions
 
