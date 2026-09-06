@@ -17,8 +17,21 @@ resource "github_repository" "this" {
   allow_update_branch    = var.allow_update_branch
   allow_forking          = var.allow_forking
 
-  archived             = var.archived
-  archive_on_destroy   = var.archive_on_destroy
+  archived = var.archived
+
+  # archive_on_destroy has no GitHub API counterpart: the provider never reads
+  # it back, so an imported repository starts with it unset and the first plan
+  # after that import shows a diff against this value. The diff is state-only —
+  # applying it calls no API and changes nothing on GitHub — and it does not
+  # come back.
+  #
+  # It used to sit in a lifecycle block that ignored changes to it, to hide
+  # exactly that. Hiding it cost more than the diff: that also pins the value
+  # for the life of the resource, so a repository created with the default
+  # `true` could never be moved to `false`, and `terraform destroy` would
+  # archive it with no way to ask for a real deletion short of editing state.
+  archive_on_destroy = var.archive_on_destroy
+
   vulnerability_alerts = var.vulnerability_alerts
 
   dynamic "security_and_analysis" {
@@ -39,12 +52,6 @@ resource "github_repository" "this" {
         }
       }
     }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      archive_on_destroy,
-    ]
   }
 }
 

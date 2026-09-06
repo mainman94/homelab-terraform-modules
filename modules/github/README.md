@@ -9,6 +9,22 @@ Terraform module for managing a GitHub repository, its default branch, and optio
 - Optionally manages `github_repository_ruleset` resources for branch governance
 - Exposes repository identifiers and URLs as outputs
 
+## Destroying a repository
+
+`archive_on_destroy` defaults to `true`, so `terraform destroy` archives a
+repository rather than deleting it. Set it to `false` when you want a real
+deletion.
+
+The value is no longer held behind `ignore_changes`, which means two things:
+
+- You can change it on an existing repository. Under `ignore_changes` the
+  value was fixed at creation, so a repository created with the default could
+  never be deleted through Terraform at all.
+- **The first plan after importing a repository shows a diff on this
+  attribute.** GitHub's API does not return it, so an imported resource starts
+  with it unset. The diff is state-only — applying it calls no API and changes
+  nothing on GitHub — and it does not come back.
+
 ## Usage
 
 ```hcl
