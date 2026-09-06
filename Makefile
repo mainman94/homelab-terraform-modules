@@ -9,6 +9,11 @@ SHELL := bash
 .DEFAULT_GOAL := help
 
 TF ?= $(shell command -v tofu 2>/dev/null || command -v terraform 2>/dev/null || echo terraform)
+
+# pre-commit-terraform prefers `terraform`; on a tofu-only machine the
+# terraform_* hooks need telling. mise.toml sets the same value for anyone
+# using the dev container.
+export PCT_TFPATH ?= $(TF)
 MODULES := $(patsubst modules/%/,%,$(wildcard modules/*/))
 
 # `make test MODULE=github` narrows any per-module target to one module.
@@ -22,6 +27,11 @@ help: ## Show this help
 	@echo
 	@echo "  Per-module targets take MODULE=<name>, e.g. make test MODULE=github"
 	@echo "  Modules: $(MODULES)"
+
+.PHONY: tools
+tools: ## Install the pinned toolchain from mise.toml
+	@command -v mise >/dev/null || { echo "mise not on PATH — see https://mise.jdx.dev or .devcontainer" >&2; exit 1; }
+	mise install
 
 .PHONY: hooks
 hooks: ## Install the git pre-commit hook
@@ -70,12 +80,12 @@ lint-deep: ## tflint including provider rulesets (fetches plugins)
 
 .PHONY: scan
 scan: ## Scan the modules for misconfigurations (advisory, like CI)
-	@command -v trivy >/dev/null || { echo "trivy not on PATH — see .devcontainer" >&2; exit 1; }
+	@command -v trivy >/dev/null || { echo "trivy not on PATH — run make tools" >&2; exit 1; }
 	trivy config modules/
 
 .PHONY: scan-strict
 scan-strict: ## Same scan, but fail on any finding
-	@command -v trivy >/dev/null || { echo "trivy not on PATH — see .devcontainer" >&2; exit 1; }
+	@command -v trivy >/dev/null || { echo "trivy not on PATH — run make tools" >&2; exit 1; }
 	trivy config --exit-code 1 modules/
 
 .PHONY: security

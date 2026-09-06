@@ -21,6 +21,7 @@ Modules: `cloudflare`, `github`, `backblaze`.
 | Command                   | What it does                                          |
 | ------------------------- | ----------------------------------------------------- |
 | `make help`               | List every target                                     |
+| `make tools`              | Install the pinned toolchain from `mise.toml`         |
 | `make hooks`              | Install the git pre-commit hook (do this once)        |
 | `make check`              | Everything a PR needs: hooks + validate + tftest      |
 | `make test MODULE=github` | One module's tftest suite                             |
@@ -31,14 +32,34 @@ Modules: `cloudflare`, `github`, `backblaze`.
 | `make lint-deep`          | tflint with provider rulesets (fetches plugins)       |
 
 `make` uses `tofu` when OpenTofu is installed and `terraform` otherwise;
-override with `make TF=terraform ...`. `.devcontainer/` provides tofu, tflint,
-terraform-docs, trivy and the hook toolchain.
+override with `make TF=terraform ...`.
+
+**Tool versions live in `mise.toml` and nowhere else.** tofu, tflint,
+terraform-docs, trivy, actionlint, python and pre-commit are all pinned there;
+the dev container's post-create runs `mise install`, and CI installs from the
+same file with `jdx/mise-action`. Before this, the dev container asked for
+tflint `latest` while CI pinned 0.64.0 — a new tflint rule failed the PR and
+nobody's local run. Bump a version in `mise.toml` and all three move together;
+Renovate opens the PR.
 
 ## Automated checks
 
 `.pre-commit-config.yaml` runs on every commit: `terraform_fmt`,
 `terraform_docs`, `terraform_tflint` (core ruleset only, see `.tflint.hcl`),
-plus hygiene hooks and `gitleaks`.
+`actionlint` and `zizmor` over `.github/workflows/`, plus hygiene hooks and
+`gitleaks`.
+
+`actionlint` checks workflow schema, expression syntax and the shell inside
+`run:` blocks. `zizmor` audits the same files for CI/CD security patterns —
+unpinned actions, credentials left behind by `actions/checkout`, template
+injection through `${{ }}` in a run block. It runs as `actionlint-system`,
+i.e. the binary `mise.toml` pins, so the hook and CI cannot disagree.
+
+Every action reference in `.github/workflows/` is pinned to a **commit SHA**
+with the tag in a trailing comment. A moving tag is a supply-chain hole: the
+tag can be repointed at new code without the pin changing. Renovate keeps the
+digests current (`helpers:pinGitHubActionDigests`) — do not "tidy" a pin back
+to `@v7`.
 
 Anything needing `terraform init` — `validate`, `tofu test`, provider-aware
 tflint rules — pulls providers over the network on every run, which is too
@@ -48,7 +69,7 @@ slow for a commit hook. Those live in `make validate`, `make test` and
 `.github/workflows/ci.yml` runs all three on every PR, so the checks no
 longer depend on whoever remembered to install the hook:
 
-- **pre-commit**, with tofu, tflint and terraform-docs installed so every
+- **pre-commit**, with the whole `mise.toml` toolchain installed so every
   hook really runs. A README whose generated block is stale fails here — the
   hook rewrites it and pre-commit reports the file as modified.
 - **tftest**, one matrix leg per module. The suites use `mock_provider`, so

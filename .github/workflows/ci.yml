@@ -14,39 +14,24 @@ jobs:
     name: pre-commit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          python-version: "3.12"
+          persist-credentials: false
 
-      # terraform_fmt, terraform_docs and terraform_tflint all shell out to
-      # binaries the hooks do not install themselves.
-      - uses: opentofu/setup-opentofu@v1
+      # Every binary the hooks shell out to — tofu, tflint, terraform-docs,
+      # actionlint — plus python and pre-commit itself, all at the versions
+      # in mise.toml. That file is the only place a version is written down.
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
-          tofu_version: "1.10.6"
-
-      - uses: terraform-linters/setup-tflint@v6
-        with:
-          tflint_version: v0.64.0
-
-      # terraform-docs has no setup action that puts the binary on PATH,
-      # which is what the terraform_docs hook needs.
-      - name: Install terraform-docs
-        env:
-          TERRAFORM_DOCS_VERSION: v0.20.0
-        run: |
-          curl -sSL "https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz" \
-            | sudo tar xz -C /usr/local/bin terraform-docs
-          sudo chmod +x /usr/local/bin/terraform-docs
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       # A README whose generated block is stale fails here: the hook rewrites
       # it and pre-commit reports the file as modified.
       - name: Run every hook
-        uses: pre-commit/action@v3.0.1
-        env:
-          # pre-commit-terraform prefers `terraform`; only tofu is installed.
-          PCT_TFPATH: tofu
+        run: pre-commit run --all-files --show-diff-on-failure
 
   test:
     name: tftest (${{ matrix.module }})
@@ -56,11 +41,11 @@ jobs:
       matrix:
         module: [backblaze, cloudflare, github]
     steps:
-      - uses: actions/checkout@v7
-
-      - uses: opentofu/setup-opentofu@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          tofu_version: "1.10.6"
+          persist-credentials: false
+
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
 
       # The suites use mock_provider, so no credentials are needed — but the
       # providers still have to be downloaded before `tofu test` can plan.
@@ -78,10 +63,12 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Scan module config
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: config
           scan-ref: modules
@@ -91,6 +78,6 @@ jobs:
           # a PR on a rule nobody has triaged yet.
           exit-code: "0"
 
-      - uses: github/codeql-action/upload-sarif@v4
+      - uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
         with:
           sarif_file: trivy.sarif

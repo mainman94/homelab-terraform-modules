@@ -1,0 +1,31 @@
+# The toolchain for this repo, in one place.
+#
+# The dev container, the git hooks and CI all install from here, so a bump
+# lands in all three at once and "passes locally" cannot drift from "passes
+# CI" — which it did: the dev container installed tflint `latest` while CI
+# pinned 0.64.0, so a new tflint rule failed the PR and nobody's local run.
+#
+# Renovate keeps these pins current (mise manager). `mise install` after a
+# pull; the dev container's post-create does it for you.
+
+[tools]
+# tofu, not terraform: the modules are written against terraform >= 1.3 and
+# tofu is a drop-in for everything here. `make TF=terraform ...` still works
+# if you have it installed yourself.
+opentofu = "1.10.6"
+tflint = "0.64.0"
+terraform-docs = "0.20.0"
+trivy = "0.74.0"
+
+# Workflow linting: the actionlint-system pre-commit hook runs the binary
+# from PATH, which is this one.
+actionlint = "1.7.9"
+
+# pre-commit builds the rest of the hook toolchain into its own cached envs.
+python = "3.14"
+pre-commit = "4.6.2"
+
+[env]
+# pre-commit-terraform prefers `terraform` and only falls back to tofu when
+# told; without this the terraform_* hooks fail on a tofu-only machine.
+PCT_TFPATH = "tofu"

@@ -2,24 +2,10 @@
   "name": "homelab-terraform-modules",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "features": {
-    // Installs OpenTofu plus tflint and terragrunt. The modules are written
-    // against terraform >= 1.3 and tofu is a drop-in for everything here.
-    "ghcr.io/devcontainers/features/terraform:1": {
-      "version": "none",
-      "tflint": "latest",
-      "terragrunt": "none",
-      "installTFsec": false,
-      "installTerraformDocs": true
-    },
-    "ghcr.io/devcontainers-extra/features/opentofu:1": {
-      "version": "latest"
-    },
-    // pre-commit is a Python tool and builds the rest of the hook toolchain
-    // into its own cached envs.
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.12",
-      "installTools": false
-    },
+    // The toolchain itself is not a feature any more: mise.toml pins tofu,
+    // tflint, terraform-docs, trivy, actionlint, python and pre-commit, and
+    // post-create installs mise and runs `mise install`. One version list,
+    // shared with CI, instead of feature versions drifting from CI's pins.
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": true,
       "configureZshAsDefaultShell": true

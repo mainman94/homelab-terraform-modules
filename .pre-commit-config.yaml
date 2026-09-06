@@ -51,6 +51,23 @@ repos:
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
 
+  # Workflow linting. actionlint checks the workflow schema, expression
+  # syntax and the shell in `run:` blocks; zizmor audits the same files for
+  # CI/CD security patterns (unpinned actions, credential persistence,
+  # template injection through ${{ }} in a run block).
+  #
+  # actionlint-system runs the binary from PATH — mise.toml pins it, so the
+  # hook, CI and the dev container all agree on the version.
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.9
+    hooks:
+      - id: actionlint-system
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.9.0
+    hooks:
+      - id: zizmor
+
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
     hooks:
