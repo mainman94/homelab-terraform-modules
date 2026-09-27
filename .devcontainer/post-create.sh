@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Provision the dev container. Everything the repo needs is pinned in
 # mise.toml — tofu, tflint, terraform-docs, trivy, actionlint, python and
-# pre-commit — so this script only has to install mise and let it do the
+# prek — so this script only has to install mise and let it do the
 # rest. CI installs from the same file.
 set -euo pipefail
 
@@ -22,10 +22,10 @@ mise trust
 mise install
 
 echo "==> installing the git hook"
-mise exec -- pre-commit install
+mise exec -- prek install
 
 echo "==> warming hook environments"
-mise exec -- pre-commit install-hooks
+mise exec -- prek prepare-hooks
 
 cat <<'MSG'
 

@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "features": {
     // The toolchain itself is not a feature any more: mise.toml pins tofu,
-    // tflint, terraform-docs, trivy, actionlint, python and pre-commit, and
+    // tflint, terraform-docs, trivy, actionlint, python and prek, and
     // post-create installs mise and runs `mise install`. One version list,
     // shared with CI, instead of feature versions drifting from CI's pins.
     "ghcr.io/devcontainers/features/common-utils:2": {
