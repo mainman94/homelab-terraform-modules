@@ -19,19 +19,19 @@ jobs:
           persist-credentials: false
 
       # Every binary the hooks shell out to — tofu, tflint, terraform-docs,
-      # actionlint — plus python and pre-commit itself, all at the versions
+      # actionlint — plus python and prek itself, all at the versions
       # in mise.toml. That file is the only place a version is written down.
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
 
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          path: ~/.cache/prek
+          key: prek-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       # A README whose generated block is stale fails here: the hook rewrites
-      # it and pre-commit reports the file as modified.
+      # it and prek reports the file as modified.
       - name: Run every hook
-        run: pre-commit run --all-files --show-diff-on-failure
+        run: prek run --all-files --show-diff-on-failure
 
   test:
     name: tftest (${{ matrix.module }})

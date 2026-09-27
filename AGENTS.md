@@ -37,7 +37,7 @@ Modules: `cloudflare`, `github`, `backblaze`.
 override with `make TF=terraform ...`.
 
 **Tool versions live in `mise.toml` and nowhere else.** tofu, tflint,
-terraform-docs, trivy, actionlint, python and pre-commit are all pinned there;
+terraform-docs, trivy, actionlint, python and prek are all pinned there;
 the dev container's post-create runs `mise install`, and CI installs from the
 same file with `jdx/mise-action`. Before this, the dev container asked for
 tflint `latest` while CI pinned 0.64.0 — a new tflint rule failed the PR and
@@ -73,7 +73,7 @@ longer depend on whoever remembered to install the hook:
 
 - **pre-commit**, with the whole `mise.toml` toolchain installed so every
   hook really runs. A README whose generated block is stale fails here — the
-  hook rewrites it and pre-commit reports the file as modified.
+  hook rewrites it and prek reports the file as modified.
 - **tftest**, one matrix leg per module. The suites use `mock_provider`, so
   no credentials — but providers still download before `tofu test` can plan.
 - **trivy** config scan, uploading SARIF to the Security tab. Advisory: it

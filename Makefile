@@ -35,11 +35,11 @@ tools: ## Install the pinned toolchain from mise.toml
 
 .PHONY: hooks
 hooks: ## Install the git pre-commit hook
-	pre-commit install
+	prek install
 
 .PHONY: lint
 lint: ## Run every pre-commit hook over the whole tree
-	pre-commit run --all-files
+	prek run --all-files
 
 .PHONY: fmt
 fmt: ## Rewrite Terraform files to canonical format
@@ -47,7 +47,7 @@ fmt: ## Rewrite Terraform files to canonical format
 
 .PHONY: docs
 docs: ## Regenerate the terraform-docs block in each module README
-	pre-commit run terraform_docs --all-files
+	prek run terraform_docs --all-files
 
 .PHONY: init
 init: ## Download providers for each module (no backend)
@@ -116,4 +116,4 @@ clean: ## Remove downloaded providers
 
 .PHONY: update-hooks
 update-hooks: ## Bump pinned hook revisions
-	pre-commit autoupdate
+	prek update

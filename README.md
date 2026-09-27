@@ -74,7 +74,7 @@ make check   # what a PR needs: hooks + validate + tftest
 ```
 
 `make help` lists the rest. **Tool versions live in `mise.toml` and nowhere
-else** — tofu, tflint, terraform-docs, trivy, actionlint, python and pre-commit.
+else** — tofu, tflint, terraform-docs, trivy, actionlint, python and prek.
 CI installs from the same file, so a local run and a CI run agree.
 
 `make` prefers `tofu` and falls back to `terraform`; override with
@@ -84,7 +84,7 @@ CI installs from the same file, so a local run and a CI run agree.
 Two things are easy to trip over:
 
 - **Module READMEs are generated below `BEGIN_TF_DOCS`.** Write prose above the
-  marker; terraform-docs owns everything below it, and pre-commit fails when the
+  marker; terraform-docs owns everything below it, and prek fails when the
   block is stale.
 - **Tests use `mock_provider`**, so they need no credentials — but
   `terraform init` still downloads providers before a test can plan.
