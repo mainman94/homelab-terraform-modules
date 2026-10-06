@@ -113,6 +113,7 @@ No modules.
 | <a name="input_allow_update_branch"></a> [allow\_update\_branch](#input\_allow\_update\_branch) | Whether pull requests can be updated with the base branch from the UI. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
 | <a name="input_archive_on_destroy"></a> [archive\_on\_destroy](#input\_archive\_on\_destroy) | Archive the repository instead of deleting it on terraform destroy. | `bool` | `true` | no |
 | <a name="input_archived"></a> [archived](#input\_archived) | Whether the repository is archived. | `bool` | `false` | no |
+| <a name="input_auto_init"></a> [auto\_init](#input\_auto\_init) | Create the repository with an initial commit, so default\_branch has a branch to point at. Only read on create. | `bool` | `false` | no |
 | <a name="input_default_branch"></a> [default\_branch](#input\_default\_branch) | Default branch to enforce for the repository. Set to null to skip managing it. | `string` | `null` | no |
 | <a name="input_delete_branch_on_merge"></a> [delete\_branch\_on\_merge](#input\_delete\_branch\_on\_merge) | Whether merged branches should be deleted automatically. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
 | <a name="input_dependabot_security_updates"></a> [dependabot\_security\_updates](#input\_dependabot\_security\_updates) | Whether Dependabot security updates are enabled. Null leaves the repository's current setting untouched. | `bool` | `null` | no |
