@@ -4,6 +4,7 @@ resource "github_repository" "this" {
   homepage_url = var.homepage_url
   visibility   = var.visibility
   topics       = sort(tolist(var.topics))
+  auto_init    = var.auto_init
 
   has_issues   = var.has_issues
   has_projects = var.has_projects

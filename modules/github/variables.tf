@@ -94,6 +94,12 @@ variable "allow_update_branch" {
   nullable    = true
 }
 
+variable "auto_init" {
+  description = "Create the repository with an initial commit, so default_branch has a branch to point at. Only read on create."
+  type        = bool
+  default     = false
+}
+
 variable "allow_forking" {
   description = "Whether the repository can be forked. Null leaves the provider default behavior unchanged."
   type        = bool
