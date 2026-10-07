@@ -239,3 +239,35 @@ variable "rulesets" {
     error_message = "bypass_actors actor_type must be one of: RepositoryRole, Team, Integration, OrganizationAdmin."
   }
 }
+
+variable "environments" {
+  description = "Deployment environments keyed by environment name. deployment_branch_patterns limits which branches may deploy (null allows every branch); can_admins_bypass lets admins skip the environment's protection rules."
+  type = map(object({
+    deployment_branch_patterns = optional(set(string))
+    can_admins_bypass          = optional(bool, true)
+  }))
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for env in values(var.environments) :
+      env.deployment_branch_patterns == null ? true : length(env.deployment_branch_patterns) > 0
+    ])
+    error_message = "deployment_branch_patterns must be null (every branch) or list at least one pattern; an empty set would let no branch deploy."
+  }
+}
+
+variable "actions_permissions" {
+  description = "Repository Actions policy. Null leaves it unmanaged. allowed_actions is all, local_only or selected; sha_pinning_required rejects any action not pinned to a full commit SHA."
+  type = object({
+    allowed_actions      = optional(string, "all")
+    sha_pinning_required = optional(bool, false)
+  })
+  default  = null
+  nullable = true
+
+  validation {
+    condition     = var.actions_permissions == null ? true : contains(["all", "local_only", "selected"], var.actions_permissions.allowed_actions)
+    error_message = "actions_permissions.allowed_actions must be one of: all, local_only, selected."
+  }
+}

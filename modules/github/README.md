@@ -7,6 +7,8 @@ Terraform module for managing a GitHub repository, its default branch, and optio
 - Manages a `github_repository`
 - Optionally manages the repository default branch with `github_branch_default`
 - Optionally manages `github_repository_ruleset` resources for branch governance
+- Optionally manages deployment environments, with the branches allowed to deploy to them
+- Optionally manages the repository's Actions policy, including `sha_pinning_required`
 - Exposes repository identifiers and URLs as outputs
 
 ## Destroying a repository
@@ -59,6 +61,19 @@ module "repository" {
       }
     }
   }
+
+  # Only main may run jobs that use the release environment's secrets.
+  environments = {
+    release = {
+      deployment_branch_patterns = ["main"]
+      can_admins_bypass          = false
+    }
+  }
+
+  # Reject any workflow step whose action is not pinned to a commit SHA.
+  actions_permissions = {
+    sha_pinning_required = true
+  }
 }
 ```
 
@@ -80,7 +95,7 @@ The repository import uses the repository name within the configured owner.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_github"></a> [github](#requirement\_github) | ~> 6.0 |
+| <a name="requirement_github"></a> [github](#requirement\_github) | ~> 6.13 |
 
 ## Providers
 
@@ -96,15 +111,19 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [github_actions_repository_permissions.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_repository_permissions) | resource |
 | [github_branch_default.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_default) | resource |
 | [github_repository.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository) | resource |
 | [github_repository_dependabot_security_updates.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_dependabot_security_updates) | resource |
+| [github_repository_environment.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_environment) | resource |
+| [github_repository_environment_deployment_policy.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_environment_deployment_policy) | resource |
 | [github_repository_ruleset.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_ruleset) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_actions_permissions"></a> [actions\_permissions](#input\_actions\_permissions) | Repository Actions policy. Null leaves it unmanaged. allowed\_actions is all, local\_only or selected; sha\_pinning\_required rejects any action not pinned to a full commit SHA. | <pre>object({<br/>    allowed_actions      = optional(string, "all")<br/>    sha_pinning_required = optional(bool, false)<br/>  })</pre> | `null` | no |
 | <a name="input_allow_auto_merge"></a> [allow\_auto\_merge](#input\_allow\_auto\_merge) | Whether auto-merge is allowed. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
 | <a name="input_allow_forking"></a> [allow\_forking](#input\_allow\_forking) | Whether the repository can be forked. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
 | <a name="input_allow_merge_commit"></a> [allow\_merge\_commit](#input\_allow\_merge\_commit) | Whether merge commits are allowed. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
@@ -118,6 +137,7 @@ No modules.
 | <a name="input_delete_branch_on_merge"></a> [delete\_branch\_on\_merge](#input\_delete\_branch\_on\_merge) | Whether merged branches should be deleted automatically. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
 | <a name="input_dependabot_security_updates"></a> [dependabot\_security\_updates](#input\_dependabot\_security\_updates) | Whether Dependabot security updates are enabled. Null leaves the repository's current setting untouched. | `bool` | `null` | no |
 | <a name="input_description"></a> [description](#input\_description) | Repository description. Set to null to leave it unset. | `string` | `null` | no |
+| <a name="input_environments"></a> [environments](#input\_environments) | Deployment environments keyed by environment name. deployment\_branch\_patterns limits which branches may deploy (null allows every branch); can\_admins\_bypass lets admins skip the environment's protection rules. | <pre>map(object({<br/>    deployment_branch_patterns = optional(set(string))<br/>    can_admins_bypass          = optional(bool, true)<br/>  }))</pre> | `{}` | no |
 | <a name="input_has_issues"></a> [has\_issues](#input\_has\_issues) | Whether issues are enabled for the repository. | `bool` | `true` | no |
 | <a name="input_has_projects"></a> [has\_projects](#input\_has\_projects) | Whether projects are enabled for the repository. | `bool` | `false` | no |
 | <a name="input_has_wiki"></a> [has\_wiki](#input\_has\_wiki) | Whether the wiki is enabled for the repository. | `bool` | `false` | no |
@@ -134,6 +154,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_environment_names"></a> [environment\_names](#output\_environment\_names) | Names of the managed deployment environments. |
 | <a name="output_repository_default_branch"></a> [repository\_default\_branch](#output\_repository\_default\_branch) | Managed default branch name, or null when not configured. |
 | <a name="output_repository_full_name"></a> [repository\_full\_name](#output\_repository\_full\_name) | GitHub repository full name. |
 | <a name="output_repository_html_url"></a> [repository\_html\_url](#output\_repository\_html\_url) | GitHub repository HTML URL. |

@@ -27,3 +27,8 @@ output "ruleset_ids" {
   description = "Map of ruleset Terraform keys to GitHub ruleset node IDs."
   value       = { for k, r in github_repository_ruleset.this : k => r.node_id }
 }
+
+output "environment_names" {
+  description = "Names of the managed deployment environments."
+  value       = sort(keys(github_repository_environment.this))
+}

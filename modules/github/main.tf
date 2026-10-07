@@ -135,3 +135,48 @@ resource "github_repository_ruleset" "this" {
     }
   }
 }
+
+# Deployment environments. With deployment_branch_patterns set, only matching
+# branches can run a job that names the environment, so secrets stored on it
+# (a registry token, a release PAT) are out of reach of every other branch.
+resource "github_repository_environment" "this" {
+  for_each = var.environments
+
+  repository          = github_repository.this.name
+  environment         = each.key
+  can_admins_bypass   = each.value.can_admins_bypass
+  prevent_self_review = false
+
+  dynamic "deployment_branch_policy" {
+    for_each = each.value.deployment_branch_patterns == null ? [] : [1]
+
+    content {
+      protected_branches     = false
+      custom_branch_policies = true
+    }
+  }
+}
+
+resource "github_repository_environment_deployment_policy" "this" {
+  for_each = merge([
+    for env, cfg in var.environments : {
+      for pattern in coalesce(cfg.deployment_branch_patterns, []) :
+      "${env}:${pattern}" => { environment = env, pattern = pattern }
+    }
+  ]...)
+
+  repository     = github_repository.this.name
+  environment    = github_repository_environment.this[each.value.environment].environment
+  branch_pattern = each.value.pattern
+}
+
+# Managing this resource makes Terraform the owner of the repository's Actions
+# policy: Actions stay enabled and allowed_actions is set explicitly.
+resource "github_actions_repository_permissions" "this" {
+  count = var.actions_permissions == null ? 0 : 1
+
+  repository           = github_repository.this.name
+  enabled              = true
+  allowed_actions      = var.actions_permissions.allowed_actions
+  sha_pinning_required = var.actions_permissions.sha_pinning_required
+}
