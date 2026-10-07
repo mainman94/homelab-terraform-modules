@@ -118,3 +118,82 @@ run "accepts_valid_inputs" {
     }
   }
 }
+
+run "rejects_empty_deployment_branch_patterns" {
+  command = plan
+
+  variables {
+    name = "test-repo"
+    environments = {
+      release = {
+        deployment_branch_patterns = []
+      }
+    }
+  }
+
+  expect_failures = [var.environments]
+}
+
+run "rejects_invalid_allowed_actions" {
+  command = plan
+
+  variables {
+    name = "test-repo"
+    actions_permissions = {
+      allowed_actions = "everything"
+    }
+  }
+
+  expect_failures = [var.actions_permissions]
+}
+
+run "environment_limited_to_main" {
+  command = plan
+
+  variables {
+    name = "test-repo"
+    environments = {
+      release = {
+        deployment_branch_patterns = ["main"]
+        can_admins_bypass          = false
+      }
+      preview = {}
+    }
+    actions_permissions = {
+      sha_pinning_required = true
+    }
+  }
+
+  assert {
+    condition     = length(github_repository_environment.this) == 2
+    error_message = "both environments should be planned"
+  }
+
+  assert {
+    condition     = length(github_repository_environment.this["release"].deployment_branch_policy) == 1 && length(github_repository_environment.this["preview"].deployment_branch_policy) == 0
+    error_message = "only an environment with patterns gets a custom branch policy"
+  }
+
+  assert {
+    condition     = keys(github_repository_environment_deployment_policy.this) == ["release:main"]
+    error_message = "release should get exactly one deployment policy, for main"
+  }
+
+  assert {
+    condition     = github_actions_repository_permissions.this[0].sha_pinning_required && github_actions_repository_permissions.this[0].allowed_actions == "all"
+    error_message = "actions_permissions should default allowed_actions to all and carry sha_pinning_required"
+  }
+}
+
+run "defaults_manage_neither" {
+  command = plan
+
+  variables {
+    name = "test-repo"
+  }
+
+  assert {
+    condition     = length(github_repository_environment.this) == 0 && length(github_actions_repository_permissions.this) == 0
+    error_message = "environments and the Actions policy are opt-in"
+  }
+}
