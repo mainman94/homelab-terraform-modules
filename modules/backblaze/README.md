@@ -42,14 +42,14 @@ The usage example above reflects the current module interface.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_b2"></a> [b2](#requirement\_b2) | ~> 0.12 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_b2"></a> [b2](#provider\_b2) | ~> 0.12 |
 
 ## Modules
@@ -59,13 +59,13 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [b2_bucket.this](https://registry.terraform.io/providers/Backblaze/b2/latest/docs/resources/bucket) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_bucket_info"></a> [bucket\_info](#input\_bucket\_info) | Optional metadata that should be stored on the bucket. | `map(string)` | `{}` | no |
 | <a name="input_bucket_name"></a> [bucket\_name](#input\_bucket\_name) | Name of the Backblaze B2 bucket to create. | `string` | n/a | yes |
 | <a name="input_bucket_type"></a> [bucket\_type](#input\_bucket\_type) | B2 bucket visibility. Valid values are allPrivate and allPublic. | `string` | `"allPrivate"` | no |
@@ -75,7 +75,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_bucket_id"></a> [bucket\_id](#output\_bucket\_id) | Backblaze B2 bucket ID. |
 | <a name="output_bucket_name"></a> [bucket\_name](#output\_bucket\_name) | Backblaze B2 bucket name. |
 <!-- END_TF_DOCS -->
