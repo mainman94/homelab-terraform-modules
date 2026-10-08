@@ -93,14 +93,14 @@ The repository import uses the repository name within the configured owner.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_github"></a> [github](#requirement\_github) | ~> 6.13 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_github"></a> [github](#provider\_github) | 6.13.0 |
 
 ## Modules
@@ -110,7 +110,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [github_actions_repository_permissions.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_repository_permissions) | resource |
 | [github_branch_default.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_default) | resource |
 | [github_repository.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository) | resource |
@@ -122,7 +122,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_actions_permissions"></a> [actions\_permissions](#input\_actions\_permissions) | Repository Actions policy. Null leaves it unmanaged. allowed\_actions is all, local\_only or selected; sha\_pinning\_required rejects any action not pinned to a full commit SHA. | <pre>object({<br/>    allowed_actions      = optional(string, "all")<br/>    sha_pinning_required = optional(bool, false)<br/>  })</pre> | `null` | no |
 | <a name="input_allow_auto_merge"></a> [allow\_auto\_merge](#input\_allow\_auto\_merge) | Whether auto-merge is allowed. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
 | <a name="input_allow_forking"></a> [allow\_forking](#input\_allow\_forking) | Whether the repository can be forked. Null leaves the provider default behavior unchanged. | `bool` | `null` | no |
@@ -153,7 +153,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_environment_names"></a> [environment\_names](#output\_environment\_names) | Names of the managed deployment environments. |
 | <a name="output_repository_default_branch"></a> [repository\_default\_branch](#output\_repository\_default\_branch) | Managed default branch name, or null when not configured. |
 | <a name="output_repository_full_name"></a> [repository\_full\_name](#output\_repository\_full\_name) | GitHub repository full name. |
