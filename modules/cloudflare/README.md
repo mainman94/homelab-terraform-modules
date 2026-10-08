@@ -52,14 +52,14 @@ module "cloudflare_zone" {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_cloudflare"></a> [cloudflare](#provider\_cloudflare) | ~> 5 |
 
 ## Modules
@@ -69,7 +69,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [cloudflare_dns_record.a_records](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/dns_record) | resource |
 | [cloudflare_dns_record.a_records_by_ip](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/dns_record) | resource |
 | [cloudflare_dns_record.cname_records](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/dns_record) | resource |
@@ -81,7 +81,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_a_records"></a> [a\_records](#input\_a\_records) | Set of A record names to create in the zone. Names are passed directly to Cloudflare. | `set(string)` | `[]` | no |
 | <a name="input_a_records_by_ip"></a> [a\_records\_by\_ip](#input\_a\_records\_by\_ip) | Map of A record name to IPv4 address. Use when different records need different IPs. | `map(string)` | `{}` | no |
 | <a name="input_a_records_by_ip_proxied"></a> [a\_records\_by\_ip\_proxied](#input\_a\_records\_by\_ip\_proxied) | Whether a\_records\_by\_ip records should be proxied by Cloudflare. | `bool` | `true` | no |
@@ -104,7 +104,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_a_record_ids"></a> [a\_record\_ids](#output\_a\_record\_ids) | Map of A record names to Cloudflare record IDs. |
 | <a name="output_a_records_by_ip_ids"></a> [a\_records\_by\_ip\_ids](#output\_a\_records\_by\_ip\_ids) | Map of per-IP A record names to Cloudflare record IDs. |
 | <a name="output_cname_record_ids"></a> [cname\_record\_ids](#output\_cname\_record\_ids) | Map of arbitrary CNAME record names to Cloudflare record IDs. |
