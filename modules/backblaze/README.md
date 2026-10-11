@@ -44,13 +44,13 @@ The usage example above reflects the current module interface.
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_b2"></a> [b2](#requirement\_b2) | ~> 0.12 |
+| <a name="requirement_b2"></a> [b2](#requirement\_b2) | ~> 0.14 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_b2"></a> [b2](#provider\_b2) | ~> 0.12 |
+| <a name="provider_b2"></a> [b2](#provider\_b2) | ~> 0.14 |
 
 ## Modules
 
