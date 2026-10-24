@@ -15,7 +15,7 @@
 opentofu = "1.13.2"
 tflint = "0.65.0"
 terraform-docs = "0.24.0"
-trivy = "0.76.0"
+trivy = "0.76.1"
 
 # Workflow linting: the actionlint-system pre-commit hook runs the binary
 # from PATH, which is this one.
