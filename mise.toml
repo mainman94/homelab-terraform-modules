@@ -13,7 +13,7 @@
 # tofu is a drop-in for everything here. `make TF=terraform ...` still works
 # if you have it installed yourself.
 opentofu = "1.13.2"
-tflint = "0.64.0"
+tflint = "0.65.0"
 terraform-docs = "0.24.0"
 trivy = "0.76.0"
 
