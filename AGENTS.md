@@ -61,7 +61,7 @@ Every action reference in `.github/workflows/` is pinned to a **commit SHA**
 with the tag in a trailing comment. A moving tag is a supply-chain hole: the
 tag can be repointed at new code without the pin changing. Renovate keeps the
 digests current (`helpers:pinGitHubActionDigests`) — do not "tidy" a pin back
-to `@v7`.
+to `@v7`. The one exception is `jdx/mise-action`, which stays on the floating `@v5` tag (Renovate `pinDigests: false`, zizmor `ref-pin`) because a digest pin there opened a PR for every patch release.
 
 Anything needing `terraform init` — `validate`, `tofu test`, provider-aware
 tflint rules — pulls providers over the network on every run, which is too
