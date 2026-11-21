@@ -33,8 +33,6 @@ resource "github_repository" "this" {
   # archive it with no way to ask for a real deletion short of editing state.
   archive_on_destroy = var.archive_on_destroy
 
-  vulnerability_alerts = var.vulnerability_alerts
-
   dynamic "security_and_analysis" {
     for_each = var.secret_scanning == null && var.secret_scanning_push_protection == null ? [] : [1]
 
@@ -61,6 +59,15 @@ resource "github_repository_dependabot_security_updates" "this" {
 
   repository = github_repository.this.name
   enabled    = var.dependabot_security_updates
+}
+
+# Replaces the deprecated vulnerability_alerts argument on github_repository.
+# Skipped when archived: an archived repository is read-only, so the API call fails.
+resource "github_repository_vulnerability_alerts" "this" {
+  count = var.vulnerability_alerts == null || var.archived ? 0 : 1
+
+  repository = github_repository.this.name
+  enabled    = var.vulnerability_alerts
 }
 
 resource "github_branch_default" "this" {
