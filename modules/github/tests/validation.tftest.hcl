@@ -197,3 +197,32 @@ run "defaults_manage_neither" {
     error_message = "environments and the Actions policy are opt-in"
   }
 }
+
+run "vulnerability_alerts_resource_planned_when_set" {
+  command = plan
+
+  variables {
+    name                 = "test-repo"
+    vulnerability_alerts = false
+  }
+
+  assert {
+    condition     = length(github_repository_vulnerability_alerts.this) == 1 && github_repository_vulnerability_alerts.this[0].enabled == false
+    error_message = "a set vulnerability_alerts should plan the standalone resource"
+  }
+}
+
+run "vulnerability_alerts_resource_not_on_archived_repo" {
+  command = plan
+
+  variables {
+    name                 = "test-repo"
+    archived             = true
+    vulnerability_alerts = true
+  }
+
+  assert {
+    condition     = length(github_repository_vulnerability_alerts.this) == 0
+    error_message = "an archived repository is read-only, so no vulnerability alerts resource"
+  }
+}
